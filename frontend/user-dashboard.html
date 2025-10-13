@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="utf-8" />
+    <title>KrishiMitra — User Dashboard</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { '50':'#f0fdf4','100':'#dcfce7','200':'#bbf7d0','300':'#86efac','400':'#4ade80','500':'#22c55e','600':'#16a34a','700':'#15803d','800':'#166534','900':'#14532d','950':'#052e16' }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .section { display:none; }
+        .section.active { display:block; }
+        @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .toast-in { animation: slideInUp 0.3s ease-out forwards; }
+        .toast-out { animation: fadeOut 0.3s ease-in forwards; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+    <header class="flex items-center justify-between px-4 sm:px-6 py-3 bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40 border-b dark:border-gray-700">
+        <div class="flex items-center gap-3">
+            <div class="bg-primary-600 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547a2 2 0 00-.547 1.806l.477 2.387a6 6 0 00.517 3.86l.158.318a6 6 0 00.517 3.86l2.387.477a2 2 0 001.806-.547a2 2 0 00.547-1.806l-.477-2.387a6 6 0 00-.517-3.86l-.158-.318a6 6 0 01-.517-3.86l-.477-2.387zM12 12a6 6 0 01-6-6V2.25a2 2 0 01.547-1.806l.477-2.387a6 6 0 013.86-.517l.318.158a6 6 0 003.86.517l2.387.477a2 2 0 011.806.547a2 2 0 01.547 1.806V6a6 6 0 01-6 6z" /></svg></div>
+            <h1 class="text-xl font-bold tracking-wide text-primary-700 dark:text-primary-100">KrishiMitra</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <label for="theme-toggle" class="relative inline-flex items-center cursor-pointer"><input id="theme-toggle" type="checkbox" class="sr-only peer"><div class="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div></label>
+            <div class="relative">
+                <button id="profileBtn" class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 border dark:border-gray-600"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg><span id="profileBtnName" class="hidden md:inline">Profile</span><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></button>
+                <div id="profileMenu" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border dark:border-gray-700 z-50">
+                    <a href="#" id="showAnnouncementsBtn" class="flex items-center gap-3 px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-1.707 1.707A1 1 0 003 15h14a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" /></svg>Announcements</a>
+                    <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                    <a href="#" id="logoutBtn" class="flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/50"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg>Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <aside class="w-64 bg-white dark:bg-gray-800 p-4 border-r dark:border-gray-700 min-h-[calc(100vh-68px)] sticky top-[68px]">
+            <nav id="nav-menu" class="space-y-2">
+                <button data-section="dashboard" class="nav-btn group w-full text-left p-3 rounded-lg flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg><span class="font-medium">Dashboard</span></button>
+                <button data-section="inventory" class="nav-btn group w-full text-left p-3 rounded-lg flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg><span class="font-medium">Inventory</span></button>
+                <button data-section="crops" class="nav-btn group w-full text-left p-3 rounded-lg flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h10a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.737 10.5l.84-2.52a2 2 0 011.848-1.455h2.132a2 2 0 011.848 1.455l.84 2.52m-10.224 5.686A2 2 0 017.737 15h8.526a2 2 0 011.728 1.186l-.002.001-1.743 4.356a2 2 0 01-1.848 1.455H9.48a2 2 0 01-1.848-1.455L5.89 16.186a2 2 0 011.848-2.686z" /></svg><span class="font-medium">Crops</span></button>
+                <button data-section="livestock" class="nav-btn group w-full text-left p-3 rounded-lg flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg><span class="font-medium">Livestock</span></button>
+                <button data-section="workers" class="nav-btn group w-full text-left p-3 rounded-lg flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.282-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.282.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg><span class="font-medium">Workers</span></button>
+                <button data-section="analytics" class="nav-btn group w-full text-left p-3 rounded-lg flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" /></svg><span class="font-medium">Analytics</span></button>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6 sm:p-8">
+            <section id="dashboard" class="section"></section>
+            <section id="inventory" class="section"></section>
+            <section id="crops" class="section"></section>
+            <section id="livestock" class="section"></section>
+            <section id="workers" class="section"></section>
+            <section id="analytics" class="section"></section>
+        </main>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50"></div>
+    <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center">
+        <div id="modal-content" class="bg-slate-800 rounded-lg shadow-xl w-full max-w-md m-4 border border-slate-700"></div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- STATE & CONFIG ---
+    let editMode = { key: null, id: null };
+    let chartObjects = {};
+    const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser') || 'null');
+    const token = sessionStorage.getItem('authToken');
+    const API_BASE_URL = 'http://127.0.0.1:5000/api';
+    const KEYS = { inventory: 'inventory', crops: 'crops', livestock: 'livestock', workers: 'workers', broadcasts: 'broadcasts' };
+
+    if (!currentUser || !token) {
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    let dataCache = { crops: [], inventory: [], livestock: [], workers: [], broadcasts: [] };
+
+    const init = async () => {
+        document.getElementById('profileBtnName').textContent = currentUser.firstName || 'Profile';
+        initTheme();
+        setupEventListeners();
+        await loadAllDataIntoCache();
+        renderAllSections();
+        navigateTo('dashboard');
+    };
+
+    const apiFetch = async (endpoint, options = {}) => {
+        options.headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...options.headers };
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+        if (response.status === 401) { logout(); return Promise.reject(new Error('Session expired')); }
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'An API error occurred.');
+        return data;
+    };
+
+    const loadAllDataIntoCache = async () => {
+        try {
+            const [inventory, crops, livestock, workers, broadcasts] = await Promise.all([
+                apiFetch('/inventory'), apiFetch('/crops'), apiFetch('/livestock'),
+                apiFetch('/workers'), apiFetch('/broadcasts')
+            ]);
+            dataCache = { inventory, crops, livestock, workers, broadcasts };
+        } catch (error) {
+            showToast(error.message, 'error');
+        }
+    };
+    
+    const setupEventListeners = () => {
+        document.getElementById('theme-toggle').addEventListener('change', (e) => {
+            document.documentElement.className = e.target.checked ? 'dark' : 'light';
+            localStorage.setItem('theme', e.target.checked ? 'dark' : 'light');
+            initTheme();
+            navigateTo(document.querySelector('.section.active').id);
+        });
+        const profileBtn = document.getElementById('profileBtn');
+        const profileMenu = document.getElementById('profileMenu');
+        profileBtn.addEventListener('click', (e) => { e.stopPropagation(); profileMenu.classList.toggle('hidden'); });
+        document.addEventListener('click', () => profileMenu.classList.add('hidden'));
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => navigateTo(btn.dataset.section)));
+        document.getElementById('showAnnouncementsBtn').addEventListener('click', showAnnouncements);
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    };
+
+    const navigateTo = (sectionId) => {
+        document.querySelectorAll('.section').forEach(sec => sec.classList.toggle('active', sec.id === sectionId));
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            const isActive = btn.dataset.section === sectionId;
+            btn.className = `nav-btn group w-full text-left p-3 rounded-lg flex items-center gap-3 ${isActive ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-100 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/50'}`;
+        });
+        if (sectionId === 'dashboard') renderDashboard();
+        if (sectionId === 'analytics') updateAnalytics();
+    };
+
+    const initTheme = () => {
+        const theme = localStorage.getItem('theme') || 'light';
+        document.documentElement.className = theme;
+        document.getElementById('theme-toggle').checked = theme === 'dark';
+        Chart.defaults.color = theme === 'dark' ? '#9ca3af' : '#6b7280';
+        Chart.defaults.borderColor = theme === 'dark' ? '#334155' : '#e5e7eb';
+    };
+
+    const showToast = (message, type = 'success') => {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `px-6 py-3 rounded-lg text-white ${type === 'success' ? 'bg-primary-600' : 'bg-red-600'} shadow-lg toast-in`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.replace('toast-in', 'toast-out');
+            toast.addEventListener('animationend', () => toast.remove());
+        }, 3000);
+    };
+
+    const showConfirmationModal = (title, message, onConfirm) => {
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalContent = document.getElementById('modal-content');
+        const footer = `<button id="cancel-btn" class="px-4 py-2 rounded-lg border dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600">Cancel</button><button id="confirm-action-btn" class="ml-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Delete</button>`;
+        modalContent.innerHTML = `<div class="p-6"><h3 class="text-xl font-semibold text-white">${title}</h3><p class="mt-2 text-gray-300">${message}</p></div><div class="px-6 py-3 bg-slate-900 rounded-b-lg text-right">${footer}</div>`;
+        modalBackdrop.classList.remove('hidden');
+        modalBackdrop.classList.add('flex');
+        document.getElementById('confirm-action-btn').onclick = () => { onConfirm(); hideModal(); };
+        document.getElementById('cancel-btn').onclick = hideModal;
+        modalBackdrop.onclick = (e) => { if (e.target === modalBackdrop) hideModal(); };
+    };
+    window.hideModal = () => document.getElementById('modal-backdrop').classList.add('hidden');
+
+    const renderDashboard = () => {
+        const section = document.getElementById('dashboard');
+        // Define the new layout structure with clickable cards
+        section.innerHTML = `
+            <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">Your Farm Overview</h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <button id="dashCardCrops" class="text-left bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border dark:border-slate-700 hover:shadow-lg hover:dark:border-slate-500 hover:-translate-y-1 transition-all duration-300">
+                    <div><div class="text-sm text-gray-500 dark:text-gray-400">Total Crops</div><div id="dashCropCount" class="text-2xl font-bold">0</div></div>
+                </button>
+                <button id="dashCardInventory" class="text-left bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border dark:border-slate-700 hover:shadow-lg hover:dark:border-slate-500 hover:-translate-y-1 transition-all duration-300">
+                    <div><div class="text-sm text-gray-500 dark:text-gray-400">Inventory Items</div><div id="dashInventoryCount" class="text-2xl font-bold">0</div></div>
+                </button>
+                <button id="dashCardLivestock" class="text-left bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border dark:border-slate-700 hover:shadow-lg hover:dark:border-slate-500 hover:-translate-y-1 transition-all duration-300">
+                    <div><div class="text-sm text-gray-500 dark:text-gray-400">Livestock</div><div id="dashLivestockCount" class="text-2xl font-bold">0</div></div>
+                </button>
+                <button id="dashCardWorkers" class="text-left bg-white dark:bg-slate-800 p-5 rounded-xl shadow-md border dark:border-slate-700 hover:shadow-lg hover:dark:border-slate-500 hover:-translate-y-1 transition-all duration-300">
+                    <div><div class="text-sm text-gray-500 dark:text-gray-400">Active Workers</div><div id="dashWorkerCount" class="text-2xl font-bold">0</div></div>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border dark:border-slate-700 relative">
+                    <h3 class="font-semibold mb-4">Monthly Profit (₹)</h3>
+                    <canvas id="dashboardProfitChart"></canvas>
+                </div>
+                <div class="space-y-6">
+                    <div id="plantingCalendarWidget" class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border dark:border-slate-700"></div>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border dark:border-slate-700">
+                        <h3 class="font-semibold mb-4">Active Crops (Growing)</h3>
+                        <div id="activeCropsList" class="space-y-3 max-h-40 overflow-y-auto"></div>
+                    </div>
+                    <div id="alertsWidget" class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border dark:border-slate-700"></div>
+                </div>
+            </div>
+        `;
+        
+        // --- Data Population ---
+        const crops = dataCache.crops;
+        document.getElementById('dashCropCount').textContent = crops.length;
+        document.getElementById('dashInventoryCount').textContent = dataCache.inventory.length;
+        document.getElementById('dashLivestockCount').textContent = dataCache.livestock.reduce((acc, curr) => acc + (parseInt(curr.count) || 0), 0);
+        
+        // --- BUG FIX: Filter for active workers before counting ---
+        const activeWorkers = dataCache.workers.filter(worker => worker.status === 'Active');
+        document.getElementById('dashWorkerCount').textContent = activeWorkers.length;
+        
+        renderPlantingCalendar();
+        renderAlertsWidget();
+        
+        const activeCrops = crops.filter(c => c.sowing_date && (c.harvest_qty === null || c.harvest_qty === undefined));
+        document.getElementById('activeCropsList').innerHTML = activeCrops.length > 0 ? activeCrops.slice(0, 3).map(c => `<div class="text-sm">🌱 <strong>${c.crop_name}</strong> (Sown: ${new Date(c.sowing_date).toLocaleDateString()})</div>`).join('') : `<p class="text-sm text-gray-500">No crops currently growing.</p>`;
+        
+        const monthlyData = getMonthlyFinancials(crops);
+        renderChart('dashboardProfitChart', 'line', monthlyData.labels, [{ label:'Profit (₹)', data: monthlyData.profitData, borderColor:'#16a34a', tension: 0.3, fill: true, backgroundColor: 'rgba(22, 163, 74, 0.1)' }]);
+
+        // --- Add Event Listeners for the new clickable cards ---
+        document.getElementById('dashCardCrops').addEventListener('click', () => navigateTo('crops'));
+        document.getElementById('dashCardInventory').addEventListener('click', () => navigateTo('inventory'));
+        document.getElementById('dashCardLivestock').addEventListener('click', () => navigateTo('livestock'));
+        document.getElementById('dashCardWorkers').addEventListener('click', () => navigateTo('workers'));
+    };
+    
+    const renderPlantingCalendar = () => {
+        const widget = document.getElementById('plantingCalendarWidget');
+        widget.innerHTML = `
+            <h3 class="font-semibold mb-4">Seasonal Planting Guide (Maharashtra)</h3>
+            <div class="space-y-3 text-sm">
+                <div>
+                    <p class="font-bold text-primary-500 dark:text-primary-400">🌱 Kharif (Monsoon Season)</p>
+                    <p class="text-gray-600 dark:text-gray-400 ml-2"><strong>Months:</strong> June - October</p>
+                    <p class="text-gray-600 dark:text-gray-400 ml-2"><strong>Crops:</strong> Rice, Cotton, Soybean, Sugarcane</p>
+                </div>
+                <div class="border-t border-gray-200 dark:border-slate-700 my-2"></div>
+                <div>
+                    <p class="font-bold text-blue-500 dark:text-blue-400">❄️ Rabi (Winter Season)</p>
+                    <p class="text-gray-600 dark:text-gray-400 ml-2"><strong>Months:</strong> October - March</p>
+                    <p class="text-gray-600 dark:text-gray-400 ml-2"><strong>Crops:</strong> Wheat, Onion, Gram (Chickpea), Jowar</p>
+                </div>
+                <div class="border-t border-gray-200 dark:border-slate-700 my-2"></div>
+                <div>
+                    <p class="font-bold text-yellow-500 dark:text-yellow-400">☀️ Zaid (Summer Season)</p>
+                    <p class="text-gray-600 dark:text-gray-400 ml-2"><strong>Months:</strong> March - June</p>
+                    <p class="text-gray-600 dark:text-gray-400 ml-2"><strong>Crops:</strong> Watermelon, Cucumber, Vegetables</p>
+                </div>
+            </div>
+        `;
+    };
+
+    const renderAlertsWidget = () => {
+        const widget = document.getElementById('alertsWidget');
+        let alerts = [];
+
+        // 1. Check for low inventory items
+        const INVENTORY_THRESHOLD = 10;
+        const lowStockItems = dataCache.inventory.filter(item => parseFloat(item.quantity) < INVENTORY_THRESHOLD);
+        lowStockItems.forEach(item => {
+            alerts.push(`⚠️ <strong>Low Stock:</strong> ${item.item_name} is at ${item.quantity} ${item.unit}.`);
+        });
+
+        // 2. Check for sick livestock
+        const sickLivestock = dataCache.livestock.filter(animal => animal.health_status === 'Sick');
+        sickLivestock.forEach(animal => {
+            alerts.push(`🐄 <strong>Health Alert:</strong> The ${animal.animal_type} group is marked as sick.`);
+        });
+
+        // 3. Check for upcoming harvests (in the next 30 days)
+        const today = new Date();
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(today.getDate() + 30);
+
+        const upcomingHarvests = dataCache.crops.filter(crop => {
+            if (!crop.harvest_date) return false;
+            const harvestDate = new Date(crop.harvest_date);
+            return harvestDate >= today && harvestDate <= thirtyDaysFromNow;
+        });
+        upcomingHarvests.forEach(crop => {
+            const formattedDate = new Date(crop.harvest_date).toLocaleDateString();
+            alerts.push(`🌾 <strong>Harvest Soon:</strong> ${crop.crop_name} is due for harvest around ${formattedDate}.`);
+        });
+
+        // Now, build the HTML for the widget
+        let content = '';
+        if (alerts.length === 0) {
+            content = `<div class="text-green-500 flex items-center gap-2">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                         <span>All systems normal. No alerts.</span>
+                       </div>`;
+        } else {
+            content = alerts.map(alert => `<div class="text-sm text-gray-700 dark:text-gray-300">${alert}</div>`).join('<div class="border-t border-gray-200 dark:border-slate-700 my-2"></div>');
+        }
+        
+        widget.innerHTML = `<h3 class="font-semibold mb-4">Alerts & Reminders</h3><div class="space-y-2">${content}</div>`;
+    };
+
+    const getMonthlyFinancials = (crops) => {
+        const monthly = crops.reduce((acc, c) => {
+            if (c.harvest_date) {
+                const harvestDateObj = new Date(c.harvest_date);
+                if (!isNaN(harvestDateObj.getTime())) {
+                    const year = harvestDateObj.getFullYear();
+                    const month = String(harvestDateObj.getMonth() + 1).padStart(2, '0');
+                    const monthKey = `${year}-${month}`;
+
+                    if (!acc[monthKey]) acc[monthKey] = { revenue: 0, expenses: 0, harvest: 0, wastage: 0 };
+                    acc[monthKey].revenue += parseFloat(c.revenue) || 0;
+                    acc[monthKey].expenses += parseFloat(c.expenses) || 0;
+                    acc[monthKey].harvest += parseFloat(c.harvest_qty) || 0;
+                    acc[monthKey].wastage += parseFloat(c.wastage) || 0;
+                }
+            }
+            return acc;
+        }, {});
+
+        const sortedMonths = Object.keys(monthly).sort();
+        
+        return {
+            labels: sortedMonths.map(m => {
+                const date = new Date(m + '-02T00:00:00Z');
+                return date.toLocaleString('default', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+            }),
+            profitData: sortedMonths.map(m => monthly[m].revenue - monthly[m].expenses),
+            revenueData: sortedMonths.map(m => monthly[m].revenue),
+            harvestData: sortedMonths.map(m => monthly[m].harvest),
+            wastageData: sortedMonths.map(m => monthly[m].wastage),
+        };
+    };
+
+    const updateAnalytics = () => {
+        const section = document.getElementById('analytics');
+        section.innerHTML = `<h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">📊 Financial & Yield Analytics</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border dark:border-slate-700"><h3 class="font-semibold mb-4">Monthly Profit (₹)</h3><canvas id="profitChart"></canvas></div>
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border dark:border-slate-700"><h3 class="font-semibold mb-4">Monthly Revenue (₹)</h3><canvas id="revenueChart"></canvas></div>
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border dark:border-slate-700"><h3 class="font-semibold mb-4">Monthly Harvest (kg)</h3><canvas id="harvestChart"></canvas></div>
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border dark:border-slate-700"><h3 class="font-semibold mb-4">Monthly Wastage (kg)</h3><canvas id="wastageChart"></canvas></div>
+            </div>`;
+        const monthlyData = getMonthlyFinancials(dataCache.crops);
+        renderChart('profitChart', 'line', monthlyData.labels, [{ label: 'Profit (₹)', data: monthlyData.profitData, borderColor: '#16a34a' }]);
+        renderChart('revenueChart', 'line', monthlyData.labels, [{ label: 'Revenue (₹)', data: monthlyData.revenueData, borderColor: '#3b82f6' }]);
+        renderChart('harvestChart', 'line', monthlyData.labels, [{ label: 'Harvest (kg)', data: monthlyData.harvestData, borderColor: '#facc15' }]);
+        renderChart('wastageChart', 'line', monthlyData.labels, [{ label: 'Wastage (kg)', data: monthlyData.wastageData, borderColor: '#ef4444' }]);
+    };
+    
+    const renderChart = (canvasId, type, labels, datasets) => {
+        if (chartObjects[canvasId]) chartObjects[canvasId].destroy();
+        const ctx = document.getElementById(canvasId)?.getContext('2d');
+        if (ctx) {
+            chartObjects[canvasId] = new Chart(ctx, { type, data: { labels, datasets }, options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } } });
+        }
+    };
+
+    const renderAllSections = () => {
+        const config = {
+            inventory: { title: '📦 Inventory Management', form: getInventoryForm, cols: [{key:'item_name',label:'Item'},{key:'quantity',label:'Quantity'},{key:'unit',label:'Unit'}] },
+            crops: { title: '🌱 Crop Management', form: getCropForm, cols: [{key:'crop_name',label:'Crop'}, {key:'area',label:'Area', fmt:e=>`${e.area} ${e.area_unit}`}, {key:'revenue',label:'Revenue (₹)'}, {key:'expenses',label:'Expenses (₹)'}, {key:'profit',label:'Profit (₹)', fmt:e=>(parseFloat(e.revenue)||0)-(parseFloat(e.expenses)||0)}] },
+            livestock: { title: '🐄 Livestock Management', form: getLivestockForm, cols: [{key:'animal_type',label:'Type'}, {key:'count',label:'Count'}, {key:'breed',label:'Breed'}, {key:'health_status',label:'Health Status'}] },
+            workers: { title: '👨‍🌾 Worker Management', form: getWorkerForm, cols: [{key:'worker_name',label:'Name'}, {key:'role',label:'Role'}, {key:'contact',label:'Contact'}, {key:'salary',label:'Salary (₹)'}, {key:'status',label:'Status'}] }
+        };
+        for (const id in config) {
+            renderSection(id, config[id].title, config[id].form);
+            renderTable(id, KEYS[id], config[id].cols);
+        }
+    };
+
+    const renderSection = (id, title, formGenerator) => {
+        const sectionEl = document.getElementById(id);
+        sectionEl.innerHTML = `<h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-6">${title}</h2><div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border dark:border-gray-700"><form id="${id}Form" class="mb-6">${formGenerator()}</form><div id="${id}TableContainer"></div></div>`;
+        const form = document.getElementById(`${id}Form`);
+        form.addEventListener('submit', (e) => handleFormSubmit(e, id, KEYS[id]));
+        if (id === 'crops') {
+            form.elements.harvest_date.addEventListener('change', () => toggleCropFinancials(form));
+        }
+    };
+    
+    const getInventoryForm = () => `<div class="grid grid-cols-1 md:grid-cols-3 gap-4">${getInput('item_name','text','Item Name',true)} ${getInput('quantity','number','Quantity',true,'min="0"')} ${getSelect('unit','Unit','<option>kg</option><option>litres</option><option>pieces</option>')} ${getButtons('Add Item')}</div>`;
+    const getCropForm = () => `<div class="grid grid-cols-1 md:grid-cols-3 gap-4">${getInput('crop_name','text','Crop Name',true)} ${getInput('sowing_date','date','Sowing Date',true)} ${getInput('harvest_date','date','Est. Harvest Date')} ${getInput('area','number','Area',true,'min="0.25" step="0.01"')} ${getSelect('area_unit','Area Unit','<option>Acre</option><option>Hectare</option>')} ${getInput('harvest_qty','number','Harvest Qty (kg)',false,'min="0" step="0.01"')} ${getInput('revenue','number','Total Revenue (₹)',false,'min="0" step="0.01"')} ${getInput('expenses','number','Total Expenses (₹)',false,'min="0" step="0.01"')} ${getInput('wastage','number','Wastage (kg)',false,'min="0" step="0.01"')} ${getButtons('Add Crop')}</div>`;
+    const getLivestockForm = () => `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${getInput('animal_type','text','Animal Type',true)} ${getInput('count','number','Count',true,'min="0"')} ${getInput('breed','text','Breed')} ${getSelect('health_status','Health Status','<option>Healthy</option><option>Sick</option><option>Vaccinated</option>')} ${getButtons('Add Livestock')}</div>`;
+    const getWorkerForm = () => `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${getInput('worker_name','text','Worker Name',true)} ${getInput('role','text','Role',true)} ${getInput('contact','tel','Contact', false, 'pattern="[0-9]{10}" title="Contact must be 10 digits."')} ${getInput('salary','number','Salary (₹)',false,'min="0"')} ${getSelect('status','Status','<option>Active</option><option>Inactive</option>')} ${getButtons('Add Worker')}</div>`;
+    
+    const getInput = (name, type, placeholder, req=false, other='') => `<div><label class="block mb-1 text-sm font-medium">${placeholder}</label><input name="${name}" type="${type}" placeholder="${placeholder}" ${req?'required':''} ${other} class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"></div>`;
+    const getSelect = (name, placeholder, options) => `<div><label class="block mb-1 text-sm font-medium">${placeholder}</label><select name="${name}" class="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600">${options}</select></div>`;
+    const getButtons = (label) => `<div id="form-buttons" class="col-span-full text-right mt-2"><button type="submit" class="bg-primary-600 text-white px-5 py-2 rounded-lg">${label}</button></div>`;
+
+    const renderTable = (id, key, columns) => {
+        const container = document.getElementById(`${id}TableContainer`);
+        const data = dataCache[key];
+        if (!data || data.length === 0) {
+            container.innerHTML = `<div class="text-center py-10"><h3 class="font-medium">No data available</h3><p class="mt-1 text-sm text-gray-500">Add an entry using the form above.</p></div>`;
+            return;
+        }
+        const headers = columns.map(c => `<th class="px-4 py-3 text-left font-semibold">${c.label}</th>`).join('') + `<th class="px-4 py-3 text-right font-semibold">Actions</th>`;
+        const rows = data.map(entry => {
+            const rowClass = (key === 'livestock' && entry.health_status === 'Sick') ? 'bg-red-100 dark:bg-red-900/50' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50';
+            const cells = columns.map(col => `<td class="px-4 py-3 whitespace-nowrap">${(typeof col.fmt === 'function') ? col.fmt(entry) : (entry[col.key] || 'N/A')}</td>`).join('');
+            const actionButtons = `<td class="px-4 py-3 text-right space-x-2"><button onclick="editEntry('${key}', ${entry.id})" class="text-yellow-500 hover:text-yellow-700 p-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg></button><button onclick="deleteEntry('${key}', ${entry.id})" class="text-red-500 hover:text-red-700 p-1"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></button></td>`;
+            return `<tr class="${rowClass}" data-id="${entry.id}">${cells}${actionButtons}</tr>`;
+        }).join('');
+        container.innerHTML = `<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-100 dark:bg-gray-700"><tr>${headers}</tr></thead><tbody class="divide-y divide-gray-200 dark:divide-gray-700">${rows}</tbody></table></div>`;
+    };
+    
+    const toggleCropFinancials = (form) => {
+        const harvestDateInput = form.elements.harvest_date;
+        const financialInputs = [form.elements.revenue, form.elements.expenses, form.elements.harvest_qty, form.elements.wastage];
+        const today = new Date().toISOString().split('T')[0];
+        const isFuture = harvestDateInput.value && harvestDateInput.value > today;
+        financialInputs.forEach(input => {
+            input.disabled = isFuture;
+            if (isFuture) input.value = '';
+        });
+    };
+
+    const handleFormSubmit = async (e, id, key) => {
+        e.preventDefault();
+        const form = e.target;
+        const payload = Object.fromEntries(new FormData(form).entries());
+        
+        if (key === 'crops') {
+            const area = parseFloat(payload.area);
+            if (isNaN(area) || area < 0.25) {
+                showToast('Area must be at least 0.25.', 'error');
+                return;
+            }
+        }
+        
+        if (key === 'workers') {
+            const contact = payload.contact;
+            if (contact && !/^\d{10}$/.test(contact)) {
+                showToast('Contact number must be exactly 10 digits.', 'error'); return;
+            }
+        }
+        
+        try {
+            if (editMode.key === key && editMode.id !== null) {
+                const updatedItem = await apiFetch(`/${key}/${editMode.id}`, { method: 'PUT', body: JSON.stringify(payload) });
+                const index = dataCache[key].findIndex(item => item.id === editMode.id);
+                if (index !== -1) dataCache[key][index] = { ...dataCache[key][index], ...payload, id: editMode.id };
+                showToast('Entry updated successfully!');
+            } else {
+                const newItem = await apiFetch(`/${key}`, { method: 'POST', body: JSON.stringify(payload) });
+                dataCache[key].unshift(newItem);
+                showToast('Entry added successfully!');
+            }
+            renderTable(id, key, configFor(id).cols);
+            resetForm(id);
+            renderDashboard();
+            if(document.querySelector('.section.active').id === 'analytics') updateAnalytics();
+        } catch (error) { showToast(error.message, 'error'); }
+    };
+    
+    window.editEntry = (key, itemId) => {
+        const entry = dataCache[key].find(item => item.id === itemId);
+        if (!entry) return;
+        editMode = { key, id: itemId };
+        const sectionId = key;
+        if (sectionId !== document.querySelector('.section.active').id) navigateTo(sectionId);
+        const form = document.getElementById(`${sectionId}Form`);
+        for (const prop in entry) {
+            if (form.elements[prop]) {
+                if (form.elements[prop].type === 'date' && entry[prop]) {
+                    form.elements[prop].value = new Date(entry[prop]).toISOString().split('T')[0];
+                } else {
+                    form.elements[prop].value = entry[prop];
+                }
+            }
+        }
+        form.querySelector('#form-buttons').innerHTML = `<button type="button" onclick="cancelEdit('${sectionId}')" class="px-5 py-2 rounded-lg border dark:border-gray-600">Cancel</button><button type="submit" class="ml-2 bg-primary-600 text-white px-5 py-2 rounded-lg">Update</button>`;
+        if (key === 'crops') toggleCropFinancials(form);
+        form.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    window.deleteEntry = (key, itemId) => {
+        const onConfirm = async () => {
+            try {
+                await apiFetch(`/${key}/${itemId}`, { method: 'DELETE' });
+                dataCache[key] = dataCache[key].filter(item => item.id !== itemId);
+                const sectionId = key;
+                renderTable(sectionId, key, configFor(sectionId).cols);
+                renderDashboard();
+                if(document.querySelector('.section.active').id === 'analytics') updateAnalytics();
+                showToast('Entry deleted.');
+            } catch(error) { showToast(error.message, 'error'); }
+        };
+        showConfirmationModal('Confirm Deletion', 'Are you sure you want to delete this entry? This action cannot be undone.', onConfirm);
+    };
+
+    const resetForm = (id) => {
+        const form = document.getElementById(`${id}Form`);
+        form.reset();
+        editMode = { key: null, id: null };
+        if (id === 'crops') toggleCropFinancials(form);
+        const config = configFor(id);
+        const buttonLabel = config.form().match(/getButtons\('([^']*)'/)?.[1] || 'Add';
+        form.querySelector('#form-buttons').innerHTML = getButtons(buttonLabel);
+    };
+    window.cancelEdit = (id) => resetForm(id);
+    
+    const configFor = (id) => ({
+        inventory: { form: getInventoryForm, cols: [{key:'item_name',label:'Item'},{key:'quantity',label:'Quantity'},{key:'unit',label:'Unit'}] },
+        crops: { form: getCropForm, cols: [{key:'crop_name',label:'Crop'}, {key:'area',label:'Area', fmt:e=>`${e.area} ${e.area_unit}`}, {key:'revenue',label:'Revenue (₹)'}, {key:'expenses',label:'Expenses (₹)'}, {key:'profit',label:'Profit (₹)', fmt:e=>(parseFloat(e.revenue)||0)-(parseFloat(e.expenses)||0)}] },
+        livestock: { form: getLivestockForm, cols: [{key:'animal_type',label:'Type'}, {key:'count',label:'Count'}, {key:'breed',label:'Breed'}, {key:'health_status',label:'Health Status'}] },
+        workers: { form: getWorkerForm, cols: [{key:'worker_name',label:'Name'}, {key:'role',label:'Role'}, {key:'contact',label:'Contact'}, {key:'salary',label:'Salary (₹)'}, {key:'status',label:'Status'}] }
+    }[id]);
+
+    const showModal = (title, content) => {
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalContent = document.getElementById('modal-content');
+        modalContent.innerHTML = `
+            <div class="flex items-center justify-between p-4 border-b dark:border-slate-700">
+                <h3 class="text-xl font-semibold text-white">${title}</h3>
+                <button onclick="hideModal()" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 text-gray-300">${content}</div>
+        `;
+        modalBackdrop.classList.remove('hidden');
+        modalBackdrop.classList.add('flex');
+        modalBackdrop.onclick = (e) => {
+            if (e.target === modalBackdrop) {
+                hideModal();
+            }
+        };
+    };
+
+    const showAnnouncements = () => {
+        if (dataCache.broadcasts.length === 0) { showModal('📣 Announcements', '<p>No announcements at this time.</p>'); return; }
+        const msgList = dataCache.broadcasts.map(b => `<div class="p-2 border-b dark:border-slate-700 last:border-b-0"><p>${b.message}</p><small class="text-gray-400">${new Date(b.created_at).toLocaleString()}</small></div>`).join('');
+        showModal('📣 Announcements', `<div class="max-h-64 overflow-y-auto">${msgList}</div>`);
+    };
+    const logout = () => {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    };
+
+    init();
+});
+</script>
+</body>
+</html>

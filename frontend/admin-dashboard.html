@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>KrishiMitra – Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: { '50':'#f0fdf4','100':'#dcfce7','200':'#bbf7d0','300':'#86efac','400':'#4ade80','500':'#22c55e','600':'#16a34a','700':'#15803d','800':'#166534','900':'#14532d','950':'#052e16' },
+                        slate: { '600': '#475569', '700': '#334155', '800': '#1e293b', '900': '#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .toast-in { animation: slideInUp 0.3s ease-out forwards; }
+        .toast-out { animation: fadeOut 0.3s ease-in forwards; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-900 text-gray-300">
+
+    <header class="flex justify-between items-center bg-slate-800 p-4 shadow-md sticky top-0 z-10 border-b border-slate-700">
+        <div class="flex items-center gap-3">
+            <div class="bg-primary-600 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547a2 2 0 00-.547 1.806l.477 2.387a6 6 0 00.517 3.86l.158.318a6 6 0 00.517 3.86l2.387.477a2 2 0 001.806-.547a2 2 0 00.547-1.806l-.477-2.387a6 6 0 00-.517-3.86l-.158-.318a6 6 0 01-.517-3.86l-.477-2.387zM12 12a6 6 0 01-6-6V2.25a2 2 0 01.547-1.806l.477-2.387a6 6 0 013.86-.517l.318.158a6 6 0 003.86.517l2.387.477a2 2 0 011.806.547a2 2 0 01.547 1.806V6a6 6 0 01-6 6z" /></svg></div>
+            <h1 class="text-xl font-bold text-white">KrishiMitra <span class="text-gray-400 font-normal">Admin</span></h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <label for="theme-toggle" class="relative inline-flex items-center cursor-pointer"><input id="theme-toggle" type="checkbox" class="sr-only peer"><div class="w-11 h-6 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div></label>
+            <button id="logoutBtn" class="bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" /></svg>Logout</button>
+        </div>
+    </header>
+
+    <div class="flex">
+        <aside class="w-64 bg-slate-800 p-4 border-r border-slate-700 min-h-[calc(100vh-68px)] sticky top-[68px]">
+            <nav id="nav-menu" class="space-y-2">
+                <a href="#" data-section="dashboard" class="nav-link group w-full text-left p-3 rounded-lg flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg><span class="font-medium">Dashboard</span></a>
+                <a href="#" data-section="users" class="nav-link group w-full text-left p-3 rounded-lg flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.282-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.282.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg><span class="font-medium">Users</span></a>
+                <a href="#" data-section="broadcast" class="nav-link group w-full text-left p-3 rounded-lg flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-3.174 7.625-7.217l-1.06-.06C13.555 4.842 12.18 8 10.364 8H7V5a2 2 0 00-2-2H2.636a1 1 0 00-.894.553l-1.448 2.897A1 1 0 001 7v1.832c0 .943.305 1.854.841 2.597l2.846 3.98M5 12h.01" /></svg><span class="font-medium">Broadcast</span></a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-6 sm:p-8 space-y-8">
+            <section id="dashboard" class="admin-section"></section>
+            <section id="users" class="admin-section"></section>
+            <section id="broadcast" class="admin-section"></section>
+        </main>
+    </div>
+
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50"></div>
+    <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden items-center justify-center">
+        <div id="modal-content" class="bg-slate-800 rounded-lg shadow-xl w-full max-w-md m-4 border border-slate-700"></div>
+    </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    let chartObjects = {};
+    const currentUser = JSON.parse(sessionStorage.getItem('loggedInUser') || 'null');
+    const token = sessionStorage.getItem('authToken');
+    const API_BASE_URL = 'http://127.0.0.1:5000/api';
+
+    if (!currentUser || !currentUser.isAdmin) {
+        window.location.href = "login.html"; 
+        return;
+    }
+
+    let dataCache = { users: [], analytics: {} };
+
+    const init = async () => {
+        initTheme();
+        setupEventListeners();
+        await loadAllDataIntoCache();
+        navigateTo('dashboard');
+    };
+
+    const apiFetch = async (endpoint, options = {}) => {
+        options.headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, ...options.headers };
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+        if (response.status === 401) { logout(); return Promise.reject(new Error('Session expired')); }
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || `An error occurred fetching ${endpoint}`);
+        return data;
+    };
+
+    const loadAllDataIntoCache = async () => {
+        try {
+            const [analytics, users] = await Promise.all([
+                apiFetch('/admin/analytics'),
+                apiFetch('/admin/users')
+            ]);
+            dataCache = { analytics, users };
+        } catch (error) {
+            console.error("API Error:", error);
+            showToast(error.message, 'error');
+        }
+    };
+    
+    const setupEventListeners = () => {
+        document.getElementById('theme-toggle').addEventListener('change', (e) => {
+            const newTheme = e.target.checked ? 'dark' : 'light';
+            document.documentElement.className = newTheme;
+            localStorage.setItem('theme', newTheme);
+            initTheme();
+            
+            const activeSectionId = document.querySelector('.admin-section.active')?.id;
+            if (activeSectionId === 'dashboard') {
+                renderDashboard();
+            }
+        });
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.querySelectorAll('.nav-link').forEach(link => link.addEventListener('click', (e) => {
+            e.preventDefault(); navigateTo(link.dataset.section);
+        }));
+    };
+
+    const navigateTo = (sectionId) => {
+        document.querySelectorAll('.admin-section').forEach(sec => sec.classList.toggle('active', sec.id === sectionId));
+        document.querySelectorAll('.nav-link').forEach(link => {
+            const isActive = link.dataset.section === sectionId;
+            link.className = `nav-link group w-full text-left p-3 rounded-lg flex items-center gap-3 transition-colors duration-200 ${isActive ? 'bg-slate-700 text-white font-semibold' : 'text-gray-400 hover:bg-slate-700 hover:text-white'}`;
+        });
+
+        if (sectionId === 'dashboard') renderDashboard();
+        if (sectionId === 'users') renderUserTable();
+        if (sectionId === 'broadcast') renderBroadcastForm();
+    };
+
+    const initTheme = () => {
+        const theme = localStorage.getItem('theme') || 'dark';
+        const isDark = theme === 'dark';
+        document.documentElement.className = theme;
+        document.getElementById('theme-toggle').checked = isDark;
+        Chart.defaults.color = isDark ? '#9ca3af' : '#6b7280';
+        Chart.defaults.borderColor = isDark ? '#334155' : '#e5e7eb';
+    };
+
+    const showToast = (message, type = 'success') => {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `px-6 py-3 rounded-lg text-white ${type === 'success' ? 'bg-primary-600' : 'bg-red-600'} shadow-lg toast-in`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.replace('toast-in', 'toast-out');
+            toast.addEventListener('animationend', () => toast.remove());
+        }, 3000);
+    };
+
+    const showConfirmationModal = (title, message, onConfirm) => {
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalContent = document.getElementById('modal-content');
+        const footer = `<button id="cancel-btn" class="px-4 py-2 rounded-lg border border-slate-600 hover:bg-slate-700">Cancel</button><button id="confirm-action-btn" class="ml-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Delete</button>`;
+        modalContent.innerHTML = `<div class="p-6"><h3 class="text-xl font-semibold text-white">${title}</h3><p class="mt-2 text-gray-300">${message}</p></div><div class="px-6 py-3 bg-slate-900 rounded-b-lg text-right">${footer}</div>`;
+        modalBackdrop.classList.remove('hidden');
+        modalBackdrop.classList.add('flex');
+        document.getElementById('confirm-action-btn').onclick = () => { onConfirm(); hideModal(); };
+        document.getElementById('cancel-btn').onclick = hideModal;
+        modalBackdrop.onclick = (e) => { if (e.target === modalBackdrop) hideModal(); };
+    };
+    window.hideModal = () => document.getElementById('modal-backdrop').classList.add('hidden');
+
+    const renderDashboard = () => {
+        const section = document.getElementById('dashboard');
+        const analytics = dataCache.analytics;
+        
+        section.innerHTML = `
+            <h2 class="text-3xl font-bold text-white mb-6">Platform Analytics</h2>
+            <div id="dashboard-content"></div>`;
+        const contentContainer = document.getElementById('dashboard-content');
+
+        if (!analytics || Object.keys(analytics).length === 0) {
+            contentContainer.innerHTML = `<div class="bg-slate-800 p-6 rounded-lg border border-slate-700 text-center text-gray-400">Loading analytics or no data is available to display.</div>`;
+            return;
+        }
+        
+        try {
+            // UPDATED: Reorganized into a 2-2-1 layout
+            contentContainer.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-slate-800 p-5 rounded-lg flex items-center gap-4 border border-slate-700"><div><div class="text-sm text-gray-400">Total Users</div><p class="text-2xl font-bold text-white">${(analytics.totalUsers || 0).toLocaleString('en-IN')}</p></div></div>
+                    <div class="bg-slate-800 p-5 rounded-lg flex items-center gap-4 border border-slate-700"><div><div class="text-sm text-gray-400">Total Revenue</div><p class="text-2xl font-bold text-white">₹${(analytics.totalRevenue || 0).toLocaleString('en-IN')}</p></div></div>
+                    <div class="bg-slate-800 p-5 rounded-lg flex items-center gap-4 border border-slate-700"><div><div class="text-sm text-gray-400">Total Harvest</div><p class="text-2xl font-bold text-white">${(analytics.totalHarvest || 0).toLocaleString('en-IN')} kg</p></div></div>
+                    <div class="bg-slate-800 p-5 rounded-lg flex items-center gap-4 border border-slate-700"><div><div class="text-sm text-gray-400">Total Livestock</div><p class="text-2xl font-bold text-white">${(analytics.totalLivestock || 0).toLocaleString('en-IN')}</p></div></div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-slate-800 p-6 rounded-lg border border-slate-700 relative"><h3 class="font-semibold mb-4 text-white">Monthly Harvest vs. Wastage (kg)</h3><canvas id="wastageAnalysisChart"></canvas></div>
+                    <div class="bg-slate-800 p-6 rounded-lg border border-slate-700 relative"><h3 class="font-semibold mb-4 text-white">Top 5 Users by Revenue</h3><canvas id="topUsersChart"></canvas></div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-slate-800 p-6 rounded-lg border border-slate-700 relative"><h3 class="font-semibold mb-4 text-white">Most Common Crops</h3><canvas id="cropDistributionChart"></canvas></div>
+                    <div class="bg-slate-800 p-6 rounded-lg border border-slate-700 relative"><h3 class="font-semibold mb-4 text-white">Livestock Distribution</h3><canvas id="livestockDistributionChart"></canvas></div>
+                </div>
+
+                <div>
+                    <div class="bg-slate-800 p-6 rounded-lg border border-slate-700 relative"><h3 class="font-semibold mb-4 text-white">Platform Inventory Snapshot</h3><canvas id="inventoryChart"></canvas></div>
+                </div>`;
+            
+            // Render charts (no changes needed here)
+            const cropData = analytics.cropDistribution ?? [];
+            renderChart('cropDistributionChart', 'bar', cropData.map(c => c.crop_name), [{ data: cropData.map(c => c.count), backgroundColor: '#22c55e' }]);
+            const livestockData = analytics.livestockDistribution ?? [];
+            renderChart('livestockDistributionChart', 'doughnut', livestockData.map(l => l.animal_type), [{ data: livestockData.map(l => l.total_count), backgroundColor: ['#3b82f6', '#f97316', '#ef4444', '#8b5cf6'], borderColor: '#1e293b', borderWidth: 4 }]);
+            const topUsersData = analytics.topUsersByRevenue ?? [];
+            renderChart('topUsersChart', 'bar', topUsersData.map(u => `${u.first_name} ${u.last_name}`), [{ label: 'Total Revenue (₹)', data: topUsersData.map(u => u.total_revenue), backgroundColor: '#3b82f6' }], 'y');
+            const inventoryData = analytics.inventorySnapshot ?? [];
+            renderChart('inventoryChart', 'bar', inventoryData.map(i => i.item_name), [{ label: 'Total Quantity', data: inventoryData.map(i => i.total_quantity), backgroundColor: '#8b5cf6' }]);
+            const wastageData = analytics.harvestVsWastage ?? [];
+            const efficiencyLabels = wastageData.map(m => new Date(m.month + '-02').toLocaleString('default', { month: 'short', year: 'numeric' }));
+            renderChart('wastageAnalysisChart', 'line', efficiencyLabels, [
+                { label: 'Total Harvest (kg)', data: wastageData.map(m => m.total_harvest), borderColor: '#16a34a', tension: 0.3, yAxisID: 'yHarvest' },
+                { label: 'Total Wastage (kg)', data: wastageData.map(m => m.total_wastage), borderColor: '#ef4444', tension: 0.3, yAxisID: 'yWastage' }
+            ], 'x', { yHarvest: { type: 'linear', display: true, position: 'left' }, yWastage: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false } } });
+        } catch (error) {
+            console.error("Error rendering dashboard charts:", error);
+            contentContainer.innerHTML = `<div class="bg-slate-800 p-6 rounded-lg border border-red-500/50 text-center text-red-400">Could not render dashboard. Please check the console for details.</div>`;
+        }
+    };
+    
+    const renderUserTable = () => {
+        const section = document.getElementById('users');
+        section.innerHTML = `<h2 class="text-3xl font-bold mb-6 text-white">User Management</h2><div id="userTableContainer" class="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden"></div>`;
+        const container = document.getElementById('userTableContainer');
+        const data = dataCache.users ?? [];
+        if (data.length === 0) {
+            container.innerHTML = `<div class="text-center py-10"><p class="text-gray-400">No registered users found.</p></div>`;
+            return;
+        }
+        const headers = ['Name', 'Email', 'Mobile', 'Address', 'Actions'].map(h => `<th class="px-4 py-3 text-left font-semibold text-gray-300">${h}</th>`).join('');
+        const rows = data.map((d, index) => `
+            <tr class="${index % 2 === 0 ? 'bg-slate-800/50' : ''} hover:bg-slate-700/50 transition-colors duration-200">
+                <td class="px-4 py-3 font-medium text-white">${d.first_name} ${d.last_name}</td>
+                <td class="px-4 py-3">${d.email}</td>
+                <td class="px-4 py-3">${d.mobile_number || 'N/A'}</td>
+                <td class="px-4 py-3">${d.address || 'N/A'}</td>
+                <td class="px-4 py-3 text-center">
+                    <button onclick="deleteUser(${d.id})" class="text-red-500 hover:text-red-400 p-1" title="Delete User">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                    </button>
+                </td>
+            </tr>`).join('');
+        container.innerHTML = `<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-700"><tr>${headers}</tr></thead><tbody class="divide-y divide-slate-700">${rows}</tbody></table></div>`;
+    };
+
+    const renderBroadcastForm = () => {
+        const section = document.getElementById('broadcast');
+        section.innerHTML = `
+            <h2 class="text-3xl font-bold mb-6 text-white">Send Broadcast Message</h2>
+            <div class="bg-slate-800 p-6 rounded-lg border border-slate-700 max-w-2xl">
+                <form id="broadcastForm">
+                    <label for="messageBox" class="block text-sm font-medium mb-2">Message to all users:</label>
+                    <textarea id="messageBox" name="message" rows="4" class="w-full p-2 border rounded-lg bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition" placeholder="Enter your announcement here..." required></textarea>
+                    <button type="submit" class="mt-4 bg-primary-600 text-white px-5 py-2 rounded-lg font-semibold flex items-center gap-2 hover:bg-primary-700 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
+                        Send Broadcast
+                    </button>
+                </form>
+            </div>`;
+        document.getElementById('broadcastForm').addEventListener('submit', sendBroadcast);
+    };
+    
+    const renderChart = (canvasId, type, labels, datasets, indexAxis = 'x', scales = {}) => {
+        if (chartObjects[canvasId]) {
+            chartObjects[canvasId].destroy();
+        }
+        const ctx = document.getElementById(canvasId)?.getContext('2d');
+        if (ctx) {
+            const options = { 
+                responsive: true, 
+                maintainAspectRatio: true, // Let Chart.js manage the aspect ratio
+                indexAxis, 
+                plugins: { 
+                    legend: { 
+                        display: type === 'doughnut' || (datasets.length > 1) 
+                    } 
+                }, 
+                scales: scales || (type !== 'doughnut' ? { y: { beginAtZero: true } } : {})
+            };
+            chartObjects[canvasId] = new Chart(ctx, { type, data: { labels, datasets }, options });
+        }
+    };
+
+    window.deleteUser = (userId) => {
+        const user = dataCache.users.find(u => u.id === userId);
+        if(!user) return;
+        const onConfirm = async () => {
+            try {
+                await apiFetch(`/admin/users/${userId}`, { method: 'DELETE' });
+                showToast(`User ${user.first_name} deleted successfully.`);
+                await loadAllDataIntoCache();
+                renderUserTable();
+                renderDashboard();
+            } catch (error) { showToast(error.message, 'error'); }
+        };
+        showConfirmationModal('Confirm Deletion', `Are you sure you want to delete ${user.first_name} ${user.last_name}? This is irreversible.`, onConfirm);
+    };
+
+    const sendBroadcast = async (event) => {
+        event.preventDefault();
+        const form = event.target;
+        const message = form.elements.message.value.trim();
+        if (!message) { showToast('Message cannot be empty', 'error'); return; }
+        try {
+            await apiFetch('/broadcasts', { method: 'POST', body: JSON.stringify({ message }) });
+            showToast('Broadcast sent successfully!');
+            form.reset();
+        } catch (error) { showToast(error.message, 'error'); }
+    };
+
+    const logout = () => {
+        sessionStorage.removeItem('loggedInUser');
+        sessionStorage.removeItem('authToken');
+        window.location.href = 'login.html';
+    };
+
+    init();
+});
+</script>
+</body>
+</html>

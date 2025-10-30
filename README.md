@@ -83,19 +83,27 @@ Once logged in, you will be directed to your personal dashboard where you can st
 To access the admin panel, log in with an account that has the isAdmin flag set to true in the database.
 
 📁 Project Structure
-KrishiMitra/
-├── backend/
-│   ├── venv/
-│   ├── middleware/
-│   ├── routes/
-│   ├── app.py
-│   ├── db.py
-│   └── requirements.txt
-└── frontend/
-    ├── assets/
-    │   └── farm-background.jpg
+├── .gitignore
+├── README.md
+├── backend
+    ├── app.py
+    ├── db.py
+    ├── middleware
+    │   └── auth_middleware.py
+    ├── requirements.txt
+    └── routes
+    │   ├── admin.py
+    │   ├── auth.py
+    │   ├── broadcasts.py
+    │   ├── crops.py
+    │   ├── inventory.py
+    │   ├── livestock.py
+    │   └── workers.py
+└── frontend
     ├── admin-dashboard.html
-    ├── index.html (redirects to login)
+    ├── assets
+        └── farm-background.jpg
+    ├── index.html
     ├── login.html
     ├── registration.html
     └── user-dashboard.html

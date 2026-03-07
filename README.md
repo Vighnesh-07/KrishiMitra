@@ -1,9 +1,12 @@
 KrishiMitra - A Modern Farm Management System
+
 📖 About the Project
+
 KrishiMitra is a web-based farm management dashboard designed to help farmers modernize their operations. It replaces traditional paper-based record-keeping with a clean, digital interface, allowing for efficient tracking of crops, inventory, livestock, and finances. The application features separate, secure dashboards for both farmers and administrators, providing tools for data-driven decision-making and platform oversight.
 This project was developed as a mini-project for the Bachelor of Engineering in Information Technology curriculum.
 
 ✨ Key Features
+
 For Farmers (User Dashboard)
 Secure Authentication: Secure user registration with password validation and login.
 Interactive Dashboard: An at-a-glance overview of key farm metrics with clickable cards for quick navigation.

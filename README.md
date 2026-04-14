@@ -86,6 +86,8 @@ Once logged in, you will be directed to your personal dashboard where you can st
 To access the admin panel, log in with an account that has the isAdmin flag set to true in the database.
 
 📁 Project Structure
+'''
+
 ├── .gitignore
 ├── README.md
 ├── backend
@@ -110,3 +112,4 @@ To access the admin panel, log in with an account that has the isAdmin flag set 
     ├── login.html
     ├── registration.html
     └── user-dashboard.html
+'''
